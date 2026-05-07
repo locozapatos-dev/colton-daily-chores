@@ -358,10 +358,18 @@ if not df.empty and "Date" in df.columns:
     ]
 
 # =====================================================
-# RELOAD CHECKBOXES WHEN DATE CHANGES
+# RELOAD CHECKBOXES WHEN DATE CHANGES OR AFTER SAVE
+# Both must happen before any widget is instantiated
 # =====================================================
 
-if st.session_state.get("prev_date") != selected_date_str:
+if st.session_state.pop("reset_checkboxes", False):
+    # After a successful save — clear all boxes
+    for chore in chores:
+        st.session_state[f"cb_{chore}"] = False
+    st.session_state.prev_date = selected_date_str
+
+elif st.session_state.get("prev_date") != selected_date_str:
+    # Date changed — load that date's saved values
     st.session_state.prev_date = selected_date_str
     for chore in chores:
         default = False
@@ -372,6 +380,7 @@ if st.session_state.get("prev_date") != selected_date_str:
             except Exception:
                 pass
         st.session_state[f"cb_{chore}"] = default
+
 else:
     # First-time initialization only
     for chore in chores:
@@ -479,10 +488,8 @@ with left_col:
             )
             resp.raise_for_status()
 
-            # Reset all checkboxes to unchecked
-            for chore in chores:
-                st.session_state[f"cb_{chore}"] = False
-
+            # Flag reset — applied at top of next run before widgets render
+            st.session_state["reset_checkboxes"] = True
             st.toast("✓ Chores saved!", icon="✅")
             st.rerun()
         except Exception as e:
