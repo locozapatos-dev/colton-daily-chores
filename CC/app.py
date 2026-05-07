@@ -424,7 +424,7 @@ with left_col:
                 "golf_practice":      1 if chore_values["Golf Practice"] else 0,
             }
             resp = requests.post(
-                st.secrets["APPS_SCRIPT_URL"],
+                "https://script.google.com/macros/s/AKfycbx8ag41V4lHwP3_FQwygXxX-HgD4f-zZnifFFgStnCkBOe7XQ_Yte6SuG-MdElWgq3m/exec",
                 json=payload,
                 timeout=15
             )
