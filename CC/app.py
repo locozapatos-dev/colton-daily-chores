@@ -3,6 +3,25 @@ import pandas as pd
 from datetime import datetime, timedelta
 import requests
 from io import StringIO
+import gspread
+from google.oauth2.service_account import Credentials
+
+# =====================================================
+# GOOGLE SHEETS AUTH
+# =====================================================
+
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+
+@st.cache_resource
+def get_gspread_client():
+    creds = Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"],
+        scopes=SCOPES
+    )
+    return gspread.authorize(creds)
 
 # =====================================================
 # GOOGLE SHEET CONFIG
@@ -414,7 +433,25 @@ with left_col:
     st.markdown('</div>', unsafe_allow_html=True)
 
     if st.button("SAVE CHORES"):
-        st.success("Dashboard currently deployed in read-only demo mode.")
+        try:
+            client = get_gspread_client()
+            sheet = client.open_by_key(SHEET_ID).sheet1
+
+            row_values = [today_string] + [
+                1 if chore_values[chore] else 0 for chore in chores
+            ]
+
+            all_dates = sheet.col_values(1)
+            if today_string in all_dates:
+                row_idx = all_dates.index(today_string) + 1
+                sheet.update(f"A{row_idx}", [row_values])
+            else:
+                sheet.append_row(row_values)
+
+            st.success("Chores saved!")
+            st.rerun()
+        except Exception as e:
+            st.error(f"Save failed: {e}")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
