@@ -27,7 +27,7 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@700;800;900&display=swap');
 
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
@@ -45,13 +45,15 @@ header { visibility: hidden; }
 /* TITLE */
 .main-title {
     text-align: center;
-    font-size: 76px;
-    font-weight: 800;
-    letter-spacing: 2px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: 4px;
     color: white;
     margin-bottom: 0;
+    text-shadow: 0 0 30px rgba(34,211,238,0.35);
 }
-.main-title span { color: #22d3ee; }
+.main-title span { color: #22d3ee; text-shadow: 0 0 40px rgba(34,211,238,0.6); }
 
 /* DATE */
 .date-container {
