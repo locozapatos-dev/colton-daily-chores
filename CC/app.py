@@ -141,9 +141,12 @@ header { visibility: hidden; }
 }
 
 /* CHECKBOX LABEL */
-.stCheckbox label {
+.stCheckbox label,
+.stCheckbox label p,
+.stCheckbox label span,
+.stCheckbox label div {
     color: #ffffff !important;
-    font-size: 21px !important;
+    font-size: 23px !important;
     font-weight: 800 !important;
     gap: 10px !important;
     align-items: center !important;
