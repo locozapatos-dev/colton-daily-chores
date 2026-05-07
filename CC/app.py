@@ -3,25 +3,6 @@ import pandas as pd
 from datetime import datetime, timedelta
 import requests
 from io import StringIO
-import gspread
-from google.oauth2.service_account import Credentials
-
-# =====================================================
-# GOOGLE SHEETS AUTH
-# =====================================================
-
-SCOPES = [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive",
-]
-
-@st.cache_resource
-def get_gspread_client():
-    creds = Credentials.from_service_account_info(
-        st.secrets["gcp_service_account"],
-        scopes=SCOPES
-    )
-    return gspread.authorize(creds)
 
 # =====================================================
 # GOOGLE SHEET CONFIG
@@ -434,20 +415,20 @@ with left_col:
 
     if st.button("SAVE CHORES"):
         try:
-            client = get_gspread_client()
-            sheet = client.open_by_key(SHEET_ID).sheet1
-
-            row_values = [today_string] + [
-                1 if chore_values[chore] else 0 for chore in chores
-            ]
-
-            all_dates = sheet.col_values(1)
-            if today_string in all_dates:
-                row_idx = all_dates.index(today_string) + 1
-                sheet.update(f"A{row_idx}", [row_values])
-            else:
-                sheet.append_row(row_values)
-
+            payload = {
+                "date": today_string,
+                "clean_skimmer":      1 if chore_values["Clean Skimmer"] else 0,
+                "strength_training":  1 if chore_values["Strength Training"] else 0,
+                "piano_practice":     1 if chore_values["Piano Practice"] else 0,
+                "drink_smoothie":     1 if chore_values["Drink Smoothie"] else 0,
+                "golf_practice":      1 if chore_values["Golf Practice"] else 0,
+            }
+            resp = requests.post(
+                st.secrets["APPS_SCRIPT_URL"],
+                json=payload,
+                timeout=15
+            )
+            resp.raise_for_status()
             st.success("Chores saved!")
             st.rerun()
         except Exception as e:
