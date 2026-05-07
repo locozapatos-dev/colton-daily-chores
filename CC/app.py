@@ -5,7 +5,7 @@ import requests
 from io import StringIO
 
 # ==========================================
-# GOOGLE SHEET CSV EXPORT URL
+# GOOGLE SHEET CONFIG
 # ==========================================
 
 SHEET_ID = "1NLgLsiF_93aELUiGbptvMNZs8BunWc0L0K_gmCTBy68"
@@ -18,108 +18,189 @@ CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
 
 st.set_page_config(
     page_title="Colton Daily Chores",
-    page_icon="⚡",
-    layout="centered"
+    layout="wide",
+    page_icon="✓"
 )
 
 # ==========================================
-# TRON CSS
+# CLEAN PROFESSIONAL CSS
 # ==========================================
 
-st.markdown(
-    """
-    <style>
+st.markdown("""
+<style>
 
-    .stApp {
-        background: linear-gradient(to bottom, #020617, #050816);
-        color: #00e5ff;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');
 
-    .title {
-        text-align: center;
-        font-size: 58px;
-        font-weight: 900;
-        color: #00e5ff;
-        margin-top: 20px;
-        margin-bottom: 10px;
-        letter-spacing: 3px;
-        text-shadow:
-            0 0 5px #00e5ff,
-            0 0 10px #00e5ff,
-            0 0 20px #00e5ff,
-            0 0 40px #0088ff;
-    }
+html, body, [class*="css"] {
+    font-family: 'Rajdhani', sans-serif;
+}
 
-    .date {
-        text-align: center;
-        font-size: 28px;
-        color: #7df9ff;
-        margin-bottom: 40px;
-        text-shadow:
-            0 0 5px #00e5ff,
-            0 0 15px #00e5ff;
-    }
+.stApp {
+    background:
+        radial-gradient(circle at top, #0b1d3a 0%, #020617 55%);
+    color: #ffffff;
+}
 
-    .stCheckbox label {
-        font-size: 22px !important;
-        font-weight: bold !important;
-        color: #00e5ff !important;
-        text-shadow: 0 0 5px #00e5ff;
-    }
+/* MAIN TITLE */
 
-    .stButton > button {
-        width: 100%;
-        background-color: transparent;
-        color: #00e5ff;
-        border: 2px solid #00e5ff;
-        border-radius: 12px;
-        padding: 14px;
-        font-size: 20px;
-        font-weight: bold;
-        box-shadow: 0 0 15px #00e5ff;
-        transition: 0.3s ease;
-    }
+.main-title {
+    text-align: center;
+    font-size: 64px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    margin-top: 10px;
+    margin-bottom: 0px;
+    color: #f8fafc;
+}
 
-    .stButton > button:hover {
-        background-color: #00e5ff;
-        color: #020617;
-        box-shadow: 0 0 25px #00e5ff;
-    }
+.main-title span {
+    color: #22d3ee;
+}
 
-    .report-box {
-        padding: 20px;
-        border-radius: 15px;
-        border: 2px solid #00e5ff;
-        background-color: rgba(0,0,0,0.4);
-        box-shadow: 0 0 20px #00e5ff;
-    }
+/* DATE */
 
-    h1, h2, h3 {
-        color: #00e5ff !important;
-        text-shadow: 0 0 10px #00e5ff;
-    }
+.date-text {
+    text-align: center;
+    font-size: 28px;
+    color: #67e8f9;
+    margin-bottom: 40px;
+}
 
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+/* SECTION CARDS */
+
+.dashboard-card {
+    background: rgba(5, 15, 35, 0.95);
+    border: 1px solid rgba(34, 211, 238, 0.25);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.35);
+}
+
+/* SECTION HEADERS */
+
+.section-header {
+    font-size: 34px;
+    font-weight: 700;
+    color: #22d3ee;
+    margin-bottom: 25px;
+}
+
+/* TABLE */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead tr {
+    background-color: rgba(15, 23, 42, 1);
+}
+
+thead th {
+    padding: 14px;
+    color: #22d3ee;
+    border: 1px solid rgba(255,255,255,0.08);
+    text-align: left;
+    font-size: 20px;
+}
+
+tbody td {
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 22px;
+}
+
+/* KPI BOXES */
+
+.kpi-box {
+    background: rgba(10, 25, 50, 0.95);
+    border: 1px solid rgba(34, 211, 238, 0.25);
+    border-radius: 14px;
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 20px;
+    height: 180px;
+}
+
+.kpi-title {
+    color: #67e8f9;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.kpi-number {
+    color: #22d3ee;
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.kpi-sub {
+    margin-top: 10px;
+    color: #cbd5e1;
+    font-size: 22px;
+}
+
+/* BUTTON */
+
+.stButton > button {
+    width: 100%;
+    background: transparent;
+    color: #22d3ee;
+    border: 2px solid #22d3ee;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 24px;
+    font-weight: 700;
+    transition: 0.3s;
+}
+
+.stButton > button:hover {
+    background: #22d3ee;
+    color: #020617;
+}
+
+/* CHECKBOXES */
+
+.stCheckbox label {
+    color: #ffffff !important;
+    font-size: 22px !important;
+}
+
+/* DATAFRAME */
+
+div[data-testid="stDataFrame"] {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* HIDE STREAMLIT MENU */
+
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+
+</style>
+""", unsafe_allow_html=True)
 
 # ==========================================
 # LOAD GOOGLE SHEET
 # ==========================================
 
 try:
+
     response = requests.get(CSV_URL)
 
     df = pd.read_csv(StringIO(response.text))
 
 except:
+
     df = pd.DataFrame(columns=[
         "Date",
         "Clean Skimmer",
         "Strength Training",
         "Piano Practice",
-        "Drink Smoothie"
+        "Drink Smoothie",
+        "Golf Practice"
     ])
 
 # ==========================================
@@ -131,21 +212,25 @@ current_date = datetime.now()
 today_string = current_date.strftime("%Y-%m-%d")
 
 try:
-    pretty_date = current_date.strftime("%A %B %-d, %Y")
+    pretty_date = current_date.strftime("%A, %B %-d, %Y")
 except:
-    pretty_date = current_date.strftime("%A %B %#d, %Y")
+    pretty_date = current_date.strftime("%A, %B %#d, %Y")
 
 # ==========================================
 # TITLE
 # ==========================================
 
 st.markdown(
-    '<div class="title">⚡ COLTON DAILY CHORES ⚡</div>',
+    """
+    <div class="main-title">
+        COLTON DAILY <span>CHORES</span>
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
 st.markdown(
-    f'<div class="date">{pretty_date}</div>',
+    f'<div class="date-text">{pretty_date}</div>',
     unsafe_allow_html=True
 )
 
@@ -157,11 +242,12 @@ chores = [
     "Clean Skimmer",
     "Strength Training",
     "Piano Practice",
-    "Drink Smoothie"
+    "Drink Smoothie",
+    "Golf Practice"
 ]
 
 # ==========================================
-# TODAY'S VALUES
+# FIND TODAY'S DATA
 # ==========================================
 
 existing_row = None
@@ -174,71 +260,128 @@ if not df.empty:
         existing_row = matches.iloc[0]
 
 # ==========================================
-# CHECKBOXES
+# TOP LAYOUT
 # ==========================================
 
-st.subheader("Today's Mission Checklist")
-
-chore_values = {}
-
-for chore in chores:
-
-    default_value = False
-
-    if existing_row is not None:
-        default_value = bool(existing_row[chore])
-
-    checked = st.checkbox(chore, value=default_value)
-
-    chore_values[chore] = checked
+left_col, right_col = st.columns([2.2, 1])
 
 # ==========================================
-# SAVE BUTTON
+# LEFT PANEL
 # ==========================================
 
-if st.button("⚡ SAVE CHORES ⚡"):
+with left_col:
 
-    st.success(
-        "⚡ Chores Updated ⚡\n\n"
-        "IMPORTANT:\n"
-        "This demo version reads from Google Sheets.\n\n"
-        "To enable WRITEBACK syncing, the next deployment step "
-        "will connect Streamlit secrets securely."
+    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+
+    st.markdown(
+        '<div class="section-header">TODAY\'S CHECKLIST</div>',
+        unsafe_allow_html=True
     )
+
+    chore_values = {}
+
+    for chore in chores:
+
+        default_value = False
+
+        if existing_row is not None:
+            default_value = bool(existing_row[chore])
+
+        checked = st.checkbox(chore, value=default_value)
+
+        chore_values[chore] = checked
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    if st.button("SAVE CHORES"):
+
+        st.success(
+            "Dashboard currently deployed in read-only demo mode."
+        )
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ==========================================
+# RIGHT PANEL
+# ==========================================
+
+with right_col:
+
+    st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+
+    st.markdown(
+        '<div class="section-header">WEEKLY SUMMARY</div>',
+        unsafe_allow_html=True
+    )
+
+    total_completed = 0
+    total_missed = 0
+
+    if not df.empty:
+
+        df["Date"] = pd.to_datetime(df["Date"])
+
+        start_of_week = current_date - timedelta(days=current_date.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+
+        weekly_df = df[
+            (df["Date"] >= pd.Timestamp(start_of_week.date())) &
+            (df["Date"] <= pd.Timestamp(end_of_week.date()))
+        ]
+
+        for chore in chores:
+
+            completed = int(weekly_df[chore].sum())
+
+            missed = len(weekly_df) - completed
+
+            total_completed += completed
+            total_missed += missed
+
+    kpi1, kpi2 = st.columns(2)
+
+    with kpi1:
+        st.markdown(f"""
+        <div class="kpi-box">
+            <div class="kpi-title">TOTAL COMPLETED</div>
+            <div class="kpi-number">{total_completed}</div>
+            <div class="kpi-sub">chores</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with kpi2:
+        st.markdown(f"""
+        <div class="kpi-box">
+            <div class="kpi-title">TOTAL MISSED</div>
+            <div class="kpi-number">{total_missed}</div>
+            <div class="kpi-sub">chores</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ==========================================
 # WEEKLY REPORT
 # ==========================================
 
-st.markdown("---")
+st.markdown("<br>", unsafe_allow_html=True)
 
-st.header("⚡ Weekly Performance Report ⚡")
+st.markdown('<div class="dashboard-card">', unsafe_allow_html=True)
+
+st.markdown(
+    '<div class="section-header">WEEKLY PERFORMANCE REPORT</div>',
+    unsafe_allow_html=True
+)
+
+report_data = []
 
 if not df.empty:
-
-    df["Date"] = pd.to_datetime(df["Date"])
-
-    start_of_week = current_date - timedelta(days=current_date.weekday())
-    end_of_week = start_of_week + timedelta(days=6)
-
-    weekly_df = df[
-        (df["Date"] >= pd.Timestamp(start_of_week.date())) &
-        (df["Date"] <= pd.Timestamp(end_of_week.date()))
-    ]
-
-    report_data = []
-
-    total_completed = 0
-    total_missed = 0
 
     for chore in chores:
 
         completed = int(weekly_df[chore].sum())
 
         missed = len(weekly_df) - completed
-
-        total_completed += completed
-        total_missed += missed
 
         percentage = 0
 
@@ -252,21 +395,12 @@ if not df.empty:
             "Completion %": f"{percentage}%"
         })
 
-    report_df = pd.DataFrame(report_data)
+report_df = pd.DataFrame(report_data)
 
-    st.dataframe(report_df, use_container_width=True)
+st.dataframe(
+    report_df,
+    use_container_width=True,
+    hide_index=True
+)
 
-    st.markdown(
-        f"""
-        <div class="report-box">
-            <h2>⚡ Weekly Summary ⚡</h2>
-            <h3>Total Completed: {total_completed}</h3>
-            <h3>Total Missed: {total_missed}</h3>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-else:
-
-    st.info("No chore data yet.")
+st.markdown('</div>', unsafe_allow_html=True)
