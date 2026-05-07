@@ -143,11 +143,12 @@ header { visibility: hidden; }
 /* CHECKBOX LABEL */
 .stCheckbox label {
     color: #ffffff !important;
-    font-size: 20px !important;
-    font-weight: 700 !important;
+    font-size: 21px !important;
+    font-weight: 800 !important;
     gap: 10px !important;
     align-items: center !important;
-    text-shadow: 0 0 12px rgba(255,255,255,0.4) !important;
+    opacity: 1 !important;
+    -webkit-font-smoothing: antialiased !important;
 }
 
 /* CUSTOM SQUARE CHECKBOX */
