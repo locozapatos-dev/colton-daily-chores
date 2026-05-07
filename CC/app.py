@@ -86,6 +86,22 @@ header { visibility: hidden; }
     gap: 8px;
 }
 
+/* DATE PICKER */
+.stDateInput > div > div > input {
+    background: rgba(13, 29, 58, 0.98) !important;
+    color: #22d3ee !important;
+    border: 1px solid rgba(103,232,249,0.45) !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    cursor: pointer !important;
+}
+.stDateInput > div > div > input:focus {
+    border-color: #22d3ee !important;
+    box-shadow: 0 0 0 2px rgba(34,211,238,0.2) !important;
+}
+
 /* CHECKLIST TABLE HEADER */
 .cl-header {
     display: flex;
@@ -280,28 +296,6 @@ except Exception:
     ])
 
 # =====================================================
-# DATE & WEEK BOUNDS
-# =====================================================
-
-current_date = datetime.now()
-today_string = current_date.strftime("%Y-%m-%d")
-
-try:
-    pretty_date = current_date.strftime("%A, %B %-d, %Y")
-except ValueError:
-    pretty_date = current_date.strftime("%A, %B %#d, %Y")
-
-start_of_week = current_date - timedelta(days=current_date.weekday())
-end_of_week = start_of_week + timedelta(days=6)
-
-try:
-    week_start_str = start_of_week.strftime("%a, %b %-d, %Y")
-    week_end_str = end_of_week.strftime("%a, %b %-d, %Y")
-except ValueError:
-    week_start_str = start_of_week.strftime("%a, %b %#d, %Y")
-    week_end_str = end_of_week.strftime("%a, %b %#d, %Y")
-
-# =====================================================
 # CHORES
 # =====================================================
 
@@ -314,15 +308,47 @@ chores = [
 ]
 
 # =====================================================
-# FIND TODAY'S DATA & WEEKLY DATA
+# SELECTED DATE (persisted in session state)
+# =====================================================
+
+current_date = datetime.now()
+
+if "selected_date" not in st.session_state:
+    st.session_state.selected_date = current_date.date()
+
+selected_date = st.session_state.selected_date
+selected_date_str = selected_date.strftime("%Y-%m-%d")
+
+try:
+    pretty_date = selected_date.strftime("%A, %B %-d, %Y")
+except ValueError:
+    pretty_date = selected_date.strftime("%A, %B %#d, %Y")
+
+# =====================================================
+# WEEK BOUNDS (based on selected date)
+# =====================================================
+
+selected_dt = datetime(selected_date.year, selected_date.month, selected_date.day)
+start_of_week = selected_dt - timedelta(days=selected_dt.weekday())
+end_of_week = start_of_week + timedelta(days=6)
+
+try:
+    week_start_str = start_of_week.strftime("%a, %b %-d, %Y")
+    week_end_str = end_of_week.strftime("%a, %b %-d, %Y")
+except ValueError:
+    week_start_str = start_of_week.strftime("%a, %b %#d, %Y")
+    week_end_str = end_of_week.strftime("%a, %b %#d, %Y")
+
+# =====================================================
+# FIND DATA FOR SELECTED DATE & WEEK
 # =====================================================
 
 existing_row = None
 weekly_df = pd.DataFrame()
 
 if not df.empty and "Date" in df.columns:
-    today_mask = df["Date"].dt.strftime("%Y-%m-%d") == today_string
-    matches = df[today_mask]
+    mask = df["Date"].dt.strftime("%Y-%m-%d") == selected_date_str
+    matches = df[mask]
     if not matches.empty:
         existing_row = matches.iloc[0]
 
@@ -332,12 +358,12 @@ if not df.empty and "Date" in df.columns:
     ]
 
 # =====================================================
-# SESSION STATE — initialize checkbox defaults once
+# RELOAD CHECKBOXES WHEN DATE CHANGES
 # =====================================================
 
-for chore in chores:
-    key = f"cb_{chore}"
-    if key not in st.session_state:
+if st.session_state.get("prev_date") != selected_date_str:
+    st.session_state.prev_date = selected_date_str
+    for chore in chores:
         default = False
         if existing_row is not None:
             try:
@@ -345,7 +371,20 @@ for chore in chores:
                 default = bool(val) if pd.notna(val) else False
             except Exception:
                 pass
-        st.session_state[key] = default
+        st.session_state[f"cb_{chore}"] = default
+else:
+    # First-time initialization only
+    for chore in chores:
+        key = f"cb_{chore}"
+        if key not in st.session_state:
+            default = False
+            if existing_row is not None:
+                try:
+                    val = existing_row[chore]
+                    default = bool(val) if pd.notna(val) else False
+                except Exception:
+                    pass
+            st.session_state[key] = default
 
 # =====================================================
 # TITLE
@@ -376,7 +415,18 @@ left_col, right_col = st.columns([2.2, 1])
 
 with left_col:
     st.markdown('<div class="panel">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">📋 TODAY\'S CHECKLIST</div>', unsafe_allow_html=True)
+
+    # Section title + date picker side by side
+    title_col, picker_col = st.columns([3, 1])
+    with title_col:
+        st.markdown('<div class="section-title">📋 TODAY\'S CHECKLIST</div>', unsafe_allow_html=True)
+    with picker_col:
+        st.date_input(
+            "date",
+            key="selected_date",
+            max_value=current_date.date(),
+            label_visibility="collapsed"
+        )
 
     # Table header
     st.markdown(
@@ -406,7 +456,6 @@ with left_col:
                 unsafe_allow_html=True
             )
 
-        # Row divider (skip after last row)
         if i < len(chores) - 1:
             st.markdown('<div class="cl-row-sep"></div>', unsafe_allow_html=True)
 
@@ -416,7 +465,7 @@ with left_col:
     if st.button("SAVE CHORES"):
         try:
             payload = {
-                "date": today_string,
+                "date":               selected_date_str,
                 "clean_skimmer":      1 if chore_values["Clean Skimmer"] else 0,
                 "strength_training":  1 if chore_values["Strength Training"] else 0,
                 "piano_practice":     1 if chore_values["Piano Practice"] else 0,
@@ -429,7 +478,12 @@ with left_col:
                 timeout=15
             )
             resp.raise_for_status()
-            st.success("Chores saved!")
+
+            # Reset all checkboxes to unchecked
+            for chore in chores:
+                st.session_state[f"cb_{chore}"] = False
+
+            st.toast("✓ Chores saved!", icon="✅")
             st.rerun()
         except Exception as e:
             st.error(f"Save failed: {e}")
